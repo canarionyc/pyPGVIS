@@ -2,6 +2,7 @@ import json
 import os
 from pathlib import Path
 from typing import Dict, List, Any
+from pprint import pprint
 
 
 def parse_pv_json(file_path: str) -> Dict[str, Any]:
@@ -19,7 +20,7 @@ def parse_all_json_files(directory: str = 'data') -> List[Dict[str, Any]]:
     for file_path in json_files:
         print(f"Parsing: {file_path}")
         try:
-            data = parse_pv_json(file_path)
+            data = parse_pv_json(file_path); pprint(data)
             results.append({
                 'file': str(file_path),
                 'data': data
@@ -67,7 +68,6 @@ def extract_summary(data: Dict[str, Any]) -> Dict[str, Any]:
 
     return summary
 
-
 if __name__ == '__main__':
     # Parse all JSON files
     results = parse_all_json_files('data')
@@ -80,7 +80,7 @@ if __name__ == '__main__':
     for result in results:
         print(f"File: {result['file']}")
         summary = extract_summary(result['data'])
-
+        pprint(summary)
         print(f"  Location: {summary.get('latitude', 'N/A')}°N, {summary.get('longitude', 'N/A')}°E")
         print(f"  Elevation: {summary.get('elevation', 'N/A')} m")
         print(f"  Technology: {summary.get('technology', 'N/A')}")
