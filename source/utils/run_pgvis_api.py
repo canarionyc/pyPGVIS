@@ -1,18 +1,16 @@
 import os
-import glob
 import json
 import time
 import requests
 import pandas as pd
-import numpy as np
-
+import csv
 
 # ==========================================
 # 1. SETUP & CONFIGURATION
 # ==========================================
 
 # Define directories
-project_root = r'C:\dev\pyPGVIS'
+project_root = r'C:\dev\pyPVGIS'
 input_folder = os.path.join(project_root,  'input')
 output_folder = os.path.join(project_root, 'output')
 
@@ -20,16 +18,17 @@ output_folder = os.path.join(project_root, 'output')
 os.makedirs(input_folder, exist_ok=True)
 os.makedirs(output_folder, exist_ok=True)
 
-# PVGIS API Base
-URL_BASE = "https://re.jrc.ec.europa.eu/api/v5_2/PVcalc"
+# PVGIS API Base URL
+URL_CALC = "https://re.jrc.ec.europa.eu/api/v5_2/PVcalc"
 
-# Fixed API parameters
+# Fixed API parameters for PVcalc
 PVGIS_PARAMS = {
 	'peakpower': 1,
 	'loss': 14,
-	'vertical_axis': 1,  # Fixed mounting
-	'angle': 90,  # Tilt (90 = vertical wall)
+	'mounting': 'fixed',
+	'angle': 45,
 	'outputformat': 'json',
+	'usehorizon': 1,
 }
 
 
@@ -48,61 +47,56 @@ else:
 	# Load the CSV
 	df_csv = pd.read_csv(input_csv_path)
 
-	# Prepare columns for results
-	df_csv['E_Y_cw'] = np.nan
-	df_csv['E_Y_aw'] = np.nan
-
 	# --- API Loop ---
 	for idx, row in df_csv.iterrows():
-		# Directly use latitude and longitude from the file
+		run_flag = str(row.get('run', '')).lower()
+		if run_flag not in ['1', 'true', 'yes']:
+			continue
+
 		lat = row['latitude']
 		lon = row['longitude']
-		id_val = row['city'] # Use city as the identifier
+		city = row['city']
+		country = row['country']
+		azimuth_val = 180  # Hardcode to South-facing
 
-		# Define the two sides (Clockwise and Anti-Clockwise)
-		sides = {
-			'cw': row['azimuth_cw'],
-			'aw': row['azimuth_aw']
-		}
+		print(f"Processing {city}, {country} for South-facing panels (180 deg)...")
 
-		for key, azimuth_val in sides.items():
-			# Construct Parameters
-			request_params = PVGIS_PARAMS.copy()
-			request_params['lat'] = lat
-			request_params['lon'] = lon
-			request_params['azimuth'] = azimuth_val  # PVGIS expects 'azimuth' param
+		request_params = PVGIS_PARAMS.copy()
+		request_params.update({'lat': lat, 'lon': lon, 'azimuth': azimuth_val})
 
-			try:
-				# Make Request
-				response = requests.get(URL_base, params=request_params)
+		try:
+			response = requests.get(URL_CALC, params=request_params)
+			if response.status_code == 200:
+				data = response.json()
+				
+				# --- 1. Save Full JSON Output ---
+				json_filename = f"{city.replace(' ', '_')}_{country.replace(' ', '_')}.json"
+				json_path = os.path.join(output_folder, json_filename)
+				with open(json_path, 'w') as f:
+					json.dump(data, f, indent=4)
+				print(f"Saved full JSON results to {json_path}")
 
-				if response.status_code == 200:
-					data = response.json()
-					# Get the yearly solar radiation value
-					e_y = data['outputs']['totals']['fixed']['E_y']
-					print(f"ID: {id_val} | Side: {key} | Az: {azimuth_val} | Radiation: {e_y}")
-				else:
-					print(f"API Error {response.status_code} for ID {id_val}: {response.text}")
-					e_y = -9999
+				# --- 2. Save Monthly Time Series CSV ---
+				monthly_data = data.get('outputs', {}).get('monthly', {}).get('fixed', [])
+				if monthly_data:
+					csv_filename = f"{city.replace(' ', '_')}_{country.replace(' ', '_')}_monthly.csv"
+					csv_path = os.path.join(output_folder, csv_filename)
+					
+					with open(csv_path, 'w', newline='', encoding='utf-8') as csvfile:
+						writer = csv.writer(csvfile)
+						# Write header from the keys of the first month's dictionary
+						writer.writerow(monthly_data[0].keys())
+						# Write data rows
+						for month in monthly_data:
+							writer.writerow(month.values())
+					print(f"Saved monthly CSV to {csv_path}")
 
-			except Exception as e:
-				print(f"Script Error on ID {id_val}: {e}")
-				e_y = -9999
+			else:
+				print(f"API Error {response.status_code} for {city}: {response.text}")
+		
+		except Exception as e:
+			print(f"Script Error on {city}: {e}")
+		
+		time.sleep(0.2)
 
-			# Update DataFrame
-			df_csv.at[idx, f"E_Y_{key}"] = e_y
-
-			# Sleep to be polite to the API (avoid rate limiting)
-			time.sleep(0.1)
-
-		# --- Save Partial Results (Every 50 rows) ---
-		if idx > 0 and idx % 50 == 0:
-			print('--- Saving Checkpoint ---')
-			filename = os.path.basename(input_csv_path)
-			df_csv.to_csv(os.path.join(output_folder, f"processed_{filename}"), index=False)
-
-	# --- Final Save ---
-	filename = os.path.basename(input_csv_path)
-	final_path = os.path.join(output_folder, f"final_{filename}")
-	df_csv.to_csv(final_path, index=False)
-	print(f"Finished. Saved to {final_path}")
+	print("Finished processing all runnable sites.")

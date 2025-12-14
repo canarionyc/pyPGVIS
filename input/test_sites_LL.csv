@@ -1,7 +1,8 @@
-city,country,latitude,longitude,elevation,azimuth_cw,azimuth_aw
-Teruel,Spain,40.3456,-1.1065,901.0,0,180
-Zermatt,Switzerland,46.0200,7.7486,1608.0,0,180
-Paris,France,48.8534,2.3488,43.0,0,180
-Madrid,Spain,40.4165,-3.7026,651.0,0,180
-Innsbruck,Austria,47.2627,11.3945,580.0,0,180
-Lisbon,Portugal,38.7167,-9.1333,48.0,0,180
+city,country,latitude,longitude,elevation,azimuth_cw,azimuth_aw,run
+Teruel,Spain,40.3456,-1.1065,901.0,0,180,
+Zermatt,Switzerland,46.0200,7.7486,1608.0,0,180,
+Paris,France,48.8534,2.3488,43.0,0,180,
+Madrid,Spain,40.4165,-3.7026,651.0,0,180,
+Innsbruck,Austria,47.2627,11.3945,580.0,0,180,
+Lisbon,Portugal,38.7167,-9.1333,48.0,0,180,
+Albarracín,Spain,40.4082,-1.4438,1172.0,0,180,yes
