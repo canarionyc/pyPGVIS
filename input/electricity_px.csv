@@ -1,25 +1,29 @@
-﻿Year,Month,Avg_Wholesale_Price_EUR_per_MWh
-2023,January,89.65
-2023,February,80
-2023,March,87.5
-2023,April,65
-2023,May,83
-2023,June,90
-2023,July,91
-2023,August,93
-2023,September,85
-2023,October,88
-2023,November,80
-2023,December,73
-2024,January,85
-2024,February,75
-2024,March,60
-2024,April,55
-2024,May,68
-2024,June,72
-2024,July,79
-2024,August,81
-2024,September,83
-2024,October,86
-2024,November,88
-2024,December,78.57
+﻿Datos Eléctricos STC                                      N-Type TOPCon 500W,,
+,,
+Máxima potencia (Pmax/W),500W ±3%,
+"Corriente de potencia máxima (Imp)                                                 13,50A",,
+Voltaje de potencia máxima (Vmp),"37,05V",
+"Corriente de cortocircuito (Isc)                                                      14,25A ±5%",,
+Voltaje de circuito abierto (Voc),"44,40V ±4%",
+"Eficiencia del módulo                                                                          22,25%",,
+Capacidad máx. fusible en serie,25A,
+Número de diodos                                                                            3,,
+Tolerancia positiva en vatios,0 ~ +5W,
+"Condiciones de prueba estándar                                     1000 W/m², 25 °C , AM 1.5",,
+Tensión máxima del sistema,1500Vdc,
+"Coeficiente de temperatura Isc                                                                        0,043% / oC",,
+Coeficiente de temperatura Voc,"-0,24% / oC",
+"Coeficiente de temperatura Pmp                                                                     -0,30% / oC",,
+Rango temperatura funcionamiento,-40oC / +85oC,
+Temperatura operación célula (TONC)                                               45oC,,
+Capacidad de carga cubierta del módulo,5400Pa (IEC61215) (nieve),
+Capacidad de carga cara frontal/trasera                        2400Pa (IEC61215) (viento),,
+"*Condiciones Estandar de Medida STC: Irradiación 1.000 W/m2, espectro AM1.5, célula a 25°C.",,
+,,
+Rendimiento Eléctrico (TONC),,
+,,
+Potencia máxima (Pmax/W),382W,
+"Voltaje de potencia máxima (Vmp)                                                    33,85V",,
+Corriente de potencia máxima (Imp),"11,28A",
+"Voltaje de circuito abierto (Voc)                                                          40,5V",,
+Corriente de cortocircuito (Isc),"11,89A",
